@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: dependencytrack-db
+    environment:
+      POSTGRES_DB: dependencytrack
+      POSTGRES_USER: dtuser
+      POSTGRES_PASSWORD: dtpassword
+    volumes:
+      - dt_pgdata:/var/lib/postgresql/data
+    networks:
+      - dt-net
+etworks:
+      - dt-net
+
+volumes:
+  dt_pgdata:
+
+networks:
+  dt-net:
+  dependency-track:
+    image: owasp/dependency-track:latest
+    container_name: dependencytrack
+    environment:
+      - DATABASE_DRIVER=org.postgresql.Driver
+      - DATABASE_URL=jdbc:postgresql://db:5432/dependencytrack
+      - DATABASE_USERNAME=dtuser
+      - DATABASE_PASSWORD=dtpassword
+      - DTRACK_BASE_URL=http://localhost:8086
+      - ALPINE_API_KEY_ENABLED=true
+    ports:
+      - "8086:8080"
+    depends_on:
+      - db
+    networks:
+      - dt-net
+
+volumes:
+  dt_pgdata:
+
+networks:
+  dt-net:
